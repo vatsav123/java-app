@@ -1,8 +1,23 @@
-# Use the OpenJDK 11 image
-FROM openjdk:11
+# Use official Maven base image to build the app
+FROM maven:3.8.6-openjdk-11-slim AS build
 
-# Copy the application JAR file (make sure to replace 'yourapp.jar' with your real JAR filename)
-COPY target/yourapp.jar /yourapp.jar
+# Set working directory
+WORKDIR /app
 
-# Run the application
-ENTRYPOINT ["java", "-jar", "/yourapp.jar"]
+# Copy the pom.xml and src folder to the container
+COPY pom.xml .
+COPY src ./src
+
+# Build the application using Maven
+RUN mvn clean install
+
+# Create the runtime image
+FROM openjdk:11-jre-slim
+
+WORKDIR /app
+
+# Copy the built JAR file from the previous stage
+COPY --from=build /app/target/java-app.jar .
+
+# Run the app
+CMD ["java", "-jar", "java-app.jar"]
