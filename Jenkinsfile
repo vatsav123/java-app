@@ -2,23 +2,25 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'srivatsav0909/my-java-app:latest' // Update to your Docker repository
-        DOCKER_USERNAME = 'srivatsav0909'               // Docker username
-        DOCKER_PASSWORD = 'Chinnu@0909'                 // Docker password
+        DOCKER_IMAGE = 'srivatsav0909/my-java-app:latest'  // Docker image name
     }
 
     stages {
         stage('Checkout') {
             steps {
-                // Checkout code from Git repository
-                git url: 'https://github.com/vatsav123/my-java-app.git', branch: 'main'
+                // Checkout code from GitHub repository using stored credentials
+                git(
+                    url: 'https://github.com/vatsav123/my-java-app.git',
+                    branch: 'main',  // Update with your branch name
+                    credentialsId: 'github-credentials'  // Use the credentials ID for GitHub access (Personal Access Token)
+                )
             }
         }
 
         stage('Build') {
             steps {
                 script {
-                    // Run Maven build (make sure to have pom.xml in your project)
+                    // Run Maven build
                     sh 'mvn clean install'
                 }
             }
@@ -27,7 +29,7 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    // Run tests using Maven (optional if you have test cases)
+                    // Run tests using Maven
                     sh 'mvn test'
                 }
             }
@@ -47,11 +49,15 @@ pipeline {
         stage('Push to Docker Hub') {
             steps {
                 script {
-                    // Log in to Docker Hub and push the image
-                    sh '''
-                        echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
-                        docker push ${DOCKER_IMAGE}
-                    '''
+                    // Log in to Docker Hub using Jenkins credentials and push the image
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', 
+                                                       usernameVariable: 'DOCKER_USERNAME', 
+                                                       passwordVariable: 'DOCKER_PASSWORD')]) {
+                        sh '''
+                            echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+                            docker push ${DOCKER_IMAGE}
+                        '''
+                    }
                 }
             }
         }
@@ -59,9 +65,8 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    // Example deployment (could be different based on your setup)
+                    // Example deployment, modify this step as per your deployment strategy
                     echo 'Deploying the app'
-                    // Add deployment commands here (e.g., using Docker or any other method)
                 }
             }
         }
