@@ -2,21 +2,23 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'vatsav123/java-app:latest'  // Docker image name
+        DOCKER_IMAGE = 'srivatsav0909/my-java-app:latest' // Update to your Docker repository
+        DOCKER_USERNAME = 'srivatsav0909'               // Docker username
+        DOCKER_PASSWORD = 'Chinnu@0909'                 // Docker password
     }
 
     stages {
         stage('Checkout') {
             steps {
                 // Checkout code from Git repository
-                git url: 'https://github.com/vatsav123/java-app.git', branch: 'main'
+                git url: 'https://github.com/vatsav123/my-java-app.git', branch: 'main'
             }
         }
 
         stage('Build') {
             steps {
                 script {
-                    // Run Maven build
+                    // Run Maven build (make sure to have pom.xml in your project)
                     sh 'mvn clean install'
                 }
             }
@@ -35,7 +37,9 @@ pipeline {
             steps {
                 script {
                     // Build the Docker image
-                    sh 'docker build -t ${DOCKER_IMAGE} .'
+                    sh '''
+                        docker build -t ${DOCKER_IMAGE} .
+                    '''
                 }
             }
         }
@@ -43,16 +47,11 @@ pipeline {
         stage('Push to Docker Hub') {
             steps {
                 script {
-                    // Log in to Docker Hub using Jenkins credentials
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', 
-                                                      usernameVariable: 'DOCKER_USERNAME', 
-                                                      passwordVariable: 'DOCKER_PASSWORD')]) {
-                        // Docker login command using the injected credentials
-                        sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
-                        
-                        // Push the Docker image to Docker Hub
-                        sh 'docker push ${DOCKER_IMAGE}'
-                    }
+                    // Log in to Docker Hub and push the image
+                    sh '''
+                        echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+                        docker push ${DOCKER_IMAGE}
+                    '''
                 }
             }
         }
