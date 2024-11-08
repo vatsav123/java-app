@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'srivatsav0909/my-java-app:latest'  // Docker image name
+        DOCKER_IMAGE = 'srivatsav0909/java-app:latest'  // Docker image name
     }
 
     stages {
@@ -10,7 +10,7 @@ pipeline {
             steps {
                 // Checkout code from GitHub repository using stored credentials
                 git(
-                    url: 'https://github.com/vatsav123/my-java-app.git',
+                    url: 'https://github.com/vatsav123/java-app.git',
                     branch: 'main',  // Update with your branch name
                     credentialsId: 'github-credentials'  // Use the credentials ID for GitHub access (Personal Access Token)
                 )
