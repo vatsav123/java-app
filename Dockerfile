@@ -6,9 +6,13 @@ WORKDIR /app
 
 # Copy the pom.xml and src folder to the container
 COPY pom.xml .
+COPY src/ ./src
 
 # Build the application using Maven
 RUN mvn clean install
+
+# Check the contents of the target directory (for debugging)
+RUN ls -l /app/target
 
 # Create the runtime image
 FROM openjdk:11-jre-slim
@@ -20,3 +24,4 @@ COPY --from=build /app/target/java-app.jar .
 
 # Run the app
 CMD ["java", "-jar", "java-app.jar"]
+
