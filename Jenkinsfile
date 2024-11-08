@@ -2,23 +2,23 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'srivatsav0909/my-java-app:latest' // Update to your Docker repository
-        DOCKER_USERNAME = 'srivatsav0909'               // Docker username
-        DOCKER_PASSWORD = 'Chinnu@0909'                 // Docker password
+        DOCKER_IMAGE = 'srivatsav0909/my-java-app:latest'
+        DOCKER_USERNAME = 'srivatsav0909'
+        DOCKER_PASSWORD = 'Chinnu@0909'
     }
 
     stages {
         stage('Checkout') {
             steps {
-                // Checkout code from Git repository
-                git url: 'https://github.com/vatsav123/my-java-app.git', branch: 'main'
+                // Checkout code from the new branch
+                git url: 'https://github.com/vatsav123/my-java-app.git', branch: 'new-branch'
             }
         }
 
         stage('Build') {
             steps {
                 script {
-                    // Run Maven build (make sure to have pom.xml in your project)
+                    // Run Maven build
                     sh 'mvn clean install'
                 }
             }
@@ -27,7 +27,7 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    // Run tests using Maven (optional if you have test cases)
+                    // Run tests using Maven
                     sh 'mvn test'
                 }
             }
@@ -59,9 +59,8 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    // Example deployment (could be different based on your setup)
+                    // Example deployment
                     echo 'Deploying the app'
-                    // Add deployment commands here (e.g., using Docker or any other method)
                 }
             }
         }
