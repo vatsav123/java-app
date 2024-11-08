@@ -2,16 +2,18 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'srivatsav0909/my-java-app:latest'
-        DOCKER_USERNAME = 'srivatsav0909'
-        DOCKER_PASSWORD = 'Chinnu@0909'
+        DOCKER_IMAGE = 'srivatsav0909/my-java-app:latest'  // Docker image name
     }
 
     stages {
         stage('Checkout') {
             steps {
-                // Checkout code from the new branch
-                git url: 'https://github.com/vatsav123/my-java-app.git', branch: 'new-branch'
+                // Checkout code from GitHub repository using stored credentials
+                git(
+                    url: 'https://github.com/vatsav123/my-java-app.git',
+                    branch: 'new-branch',  // Update with your branch name
+                    credentialsId: 'github-credentials'  // Use the credentials ID for GitHub access (Personal Access Token)
+                )
             }
         }
 
@@ -47,11 +49,15 @@ pipeline {
         stage('Push to Docker Hub') {
             steps {
                 script {
-                    // Log in to Docker Hub and push the image
-                    sh '''
-                        echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
-                        docker push ${DOCKER_IMAGE}
-                    '''
+                    // Log in to Docker Hub using Jenkins credentials and push the image
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', 
+                                                       usernameVariable: 'DOCKER_USERNAME', 
+                                                       passwordVariable: 'DOCKER_PASSWORD')]) {
+                        sh '''
+                            echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+                            docker push ${DOCKER_IMAGE}
+                        '''
+                    }
                 }
             }
         }
@@ -59,7 +65,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    // Example deployment
+                    // Example deployment, modify this step as per your deployment strategy
                     echo 'Deploying the app'
                 }
             }
